@@ -1,0 +1,26 @@
+﻿@using Correctirovka.Data
+@inherits LayoutComponentBase
+@inject ClientSettings Settings
+
+<div class="sidebar">
+    <NavMenu />
+</div>
+
+<div class="main">
+    <div class="top-row px-4">
+        @Settings.Units
+    </div>
+
+    <div class="content px-4">
+        @Body
+    </div>
+</div>
+
+@code
+{
+    protected override Task OnInitializedAsync()
+    {
+        Settings.OnChange += StateHasChanged;
+        return base.OnInitializedAsync();
+    }
+}

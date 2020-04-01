@@ -1,0 +1,63 @@
+﻿@page "/BidModifiers"
+
+@using Correctirovka.Data
+@using YD_API.Model
+@using YD_API.ModelObjects.IBidModifier
+@using YD_API.ModelObjects.ICampaign
+
+@inject NavigationManager NavigationManager
+@inject ApiConnect5 api
+@inject ClientSettings Settings
+
+<SetUnits api="@api" />
+
+<h3>BidModifiers</h3>
+
+@data.Length
+
+<h2 class="error-text">@errorH</h2>
+<h3 class="error-text">@errorD</h3>
+
+<div class="form-group">
+    <div class="col-sm-offset-2 col-sm-2">
+        <a href="/Campaigns">Назад</a>
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-sm-offset-5 col-sm-2">
+        <a href="/">Вперед</a>
+    </div>
+</div>
+
+
+@code {
+    BidModifierObject clients;
+    BidModifier[] data = new BidModifier[0];
+
+    string errorH = "";
+    string errorD = "";
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        string UserName = Settings.UserName;
+
+        if (String.IsNullOrEmpty(UserName))
+            NavigationManager.NavigateTo("/clients");
+
+        clients = new BidModifierObject(api);
+        var rez = (await clients.GetAsync(UserName, Settings.Campaigns.ToArray()));
+        if (rez == null)
+            return;
+        if (rez.Error != null)
+        {
+            errorH = rez.Error.ErrorDetail;
+            errorD = rez.Error.ErrorString;
+            return;
+        }
+        data = rez.Result.Models;
+
+        return;
+
+    }
+}

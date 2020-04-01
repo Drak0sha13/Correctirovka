@@ -1,0 +1,7 @@
+﻿<h2 class="error-text">@Error?.ErrorDetail</h2>
+<h3 class="error-text">@Error?.ErrorString</h3>
+
+@code {
+    [Parameter]
+    public GetResultError Error { get; set; }
+}

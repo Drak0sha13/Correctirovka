@@ -1,0 +1,67 @@
+﻿@page "/"
+@using YD_API.ApiConnect
+
+@inject ApiSettings Settings
+@inject NavigationManager NavigationManager
+
+<h1>Настройки</h1>
+@if (Settings == null)
+{
+    <h1>Загрузка...</h1>
+}
+else
+{
+    <EditForm Model="@Settings" OnValidSubmit=@HandleValidSubmit>
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <div class="form-group">
+                <label for="UrlDirect" class="col-sm-5 control-label">Url подключения к Api</label>
+                <div class="col-sm-7">
+                    <DxComboBox Data="@Settings.ApiUrls"
+                                AllowUserInput="true"
+                                @bind-SelectedItem="@SelectedItem"
+                                @bind-Text="@Settings.UrlDirect">
+                    </DxComboBox>
+
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="OAuthDirect" class="col-sm-5 control-label">Пользовательский токен для Яндекс директ</label>
+                <div class="col-sm-7">
+                    <InputText id="tokenApi" class="form-control" @bind-Value="@Settings.TokenApi"></InputText>
+                </div>
+                <div class="col-sm-offset-5 col-sm-7">
+                    <a href="https://yandex.ru/adv/edu/direct/direct-api/kak-poluchit-oauth-token" target="_blank"> Как получить OAuth-токен</a>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-5 col-sm-7">
+                    <button type="submit" class="btn btn-default">Сохранить</button>
+                </div>
+            </div>
+
+        </div>
+
+    </EditForm>
+}
+
+
+
+@code {
+
+    string selectedItem = "";
+    string SelectedItem { get => selectedItem; set { selectedItem = value; InvokeAsync(StateHasChanged); } }
+
+    protected override Task OnInitializedAsync()
+    {
+        selectedItem = Settings.ApiUrls.Skip(1).First();
+        return base.OnInitializedAsync();
+    }
+
+    private void HandleValidSubmit()
+    {
+        //NavigationManager
+        NavigationManager.NavigateTo("/clients", true);
+    }
+}

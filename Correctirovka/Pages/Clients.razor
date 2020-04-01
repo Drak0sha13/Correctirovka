@@ -1,0 +1,75 @@
+﻿@page "/clients"
+
+@using Correctirovka.Data
+@using YD_API.Model
+@using YD_API.ModelObjects.IClient
+@using DevExpress.Blazor
+@using YD_API.ModelObjects.IAgencyClients
+
+@inject ApiConnect5 api
+@inject ClientSettings Settings
+
+<h1>Клиенты</h1>
+<SetUnits api="@api"/>
+
+<DxDataGrid Data="@data"
+            ShowFilterRow="true"
+            @bind-SingleSelectedDataRow="@Settings.User">
+    <DxDataGridColumn Field="@nameof(Client.ClientId)" Width="70px" ></DxDataGridColumn>
+    <DxDataGridColumn Field="@nameof(Client.Login)" ></DxDataGridColumn>
+    <DxDataGridColumn Field="@nameof(Client.ClientInfo)"></DxDataGridColumn>
+</DxDataGrid>
+
+<ApiError Error="@Error" />
+
+<div class="form-group">
+    <div class="col-sm-offset-2 col-sm-2">
+        <a href="/">Назад</a>
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-sm-offset-5 col-sm-2">
+        <a href="/Campaigns/@(Settings.User?.Login)">Вперед</a>
+    </div>
+</div>
+
+@code 
+{
+	AgencyClientsObject clients;
+	Client[] data = new Client[0];
+
+	GetResultError Error { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		clients = new AgencyClientsObject(api);
+		var rez = (await clients.GetAsync());
+		if (rez == null)
+			return;
+		Error = rez.Error;
+
+		data = rez.Result?.Models;
+		if (Settings.User == null)
+			Settings.User = data?[0];
+
+	//Settings.Units = api.Units;
+		return;
+	}
+
+	enum Opinion
+	{
+		Yes,
+		No,
+		Abstain
+	}
+
+	Opinion Value = Opinion.Abstain;
+
+	string GetText()
+	{
+		if (Value == Opinion.Yes) return "Только активные";
+		if (Value == Opinion.No) return "Только архивные";
+		return "Все компании";
+	}
+
+}

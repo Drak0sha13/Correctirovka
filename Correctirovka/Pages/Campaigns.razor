@@ -1,0 +1,83 @@
+﻿@page "/Campaigns"
+@page "/Campaigns/{UserName}"
+@using Correctirovka.Data
+@using YD_API.Model
+@using YD_API.ModelObjects.ICampaign
+
+@inject NavigationManager NavigationManager
+@inject ApiConnect5 api
+@inject ClientSettings Settings
+
+<SetUnits api="@api" />
+
+<DxDataGrid Data="@data"
+            KeyFieldName="@nameof(Campaign.Id)"
+            SelectionMode="DataGridSelectionMode.OptimizedMultipleSelection"
+            SelectAllMode="DataGridSelectAllMode.AllPages"
+            OptimizedMultipleSelectionChanged="@OnSelectionChanged"
+            ShowFilterRow="true"
+            ShowPager="true"
+            ShowGroupPanel="true">
+    <DxDataGridSelectionColumn></DxDataGridSelectionColumn>
+    <DxDataGridColumn Field="@nameof(Campaign.Id)" Width="70px" AllowGroup="false"></DxDataGridColumn>
+    <DxDataGridColumn Field="@nameof(Campaign.Name)" AllowGroup="false"></DxDataGridColumn>
+    <DxDataGridColumn Field="@nameof(Campaign.Status)"></DxDataGridColumn>
+</DxDataGrid>
+
+<ApiError Error="@Error"/>
+
+<div class="form-group">
+    <div class="col-sm-offset-2 col-sm-2">
+        <a href="/clients">Назад</a>
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-sm-offset-5 col-sm-2">
+        <a href="/BidModifiers">Вперед</a>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public string UserName { get; set; }
+
+    CampaignObject clients;
+    Campaign[] data = new Campaign[0];
+
+    GetResultError Error { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (String.IsNullOrEmpty(UserName))
+            NavigationManager.NavigateTo("/clients");
+        clients = new CampaignObject(api);
+        var rez = (await clients.GetAsync(UserName));
+        if (rez == null)
+            return;
+        Error = rez.Error;
+        
+        if(rez.Result != null)
+            data = rez.Result.Models;
+
+        return;
+
+    }
+
+    int SelectedCount { get; set; }
+
+    int StoredSelectedCount { get; set; }
+
+    int StoredUnselectedCount { get; set; }
+
+    protected async Task OnSelectionChanged(DataGridSelection<Campaign> selection)
+    {
+        StoredSelectedCount = selection.SelectedKeysStored.Count();
+        StoredUnselectedCount = selection.UnselectedKeysStored.Count();
+        Settings.Campaigns = (await selection.SelectedKeys).Cast<long>();
+        //SelectedCount = selectedKeys.Count();
+        await InvokeAsync(StateHasChanged);
+    }
+
+}

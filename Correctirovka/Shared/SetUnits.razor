@@ -1,0 +1,20 @@
+﻿@using Correctirovka.Data
+
+@*@inject ApiConnect5 api*@
+@inject ClientSettings Settings
+
+@inherits Microsoft.AspNetCore.Components.LayoutComponentBase
+
+@Body
+
+@code {
+    [Parameter]
+    public ApiConnect5 api { get; set; }
+
+    protected override void OnInitialized()
+    {
+        api.OnChange += () => Settings.Units = api.Units;
+        base.OnInitialized();
+    }
+
+}
