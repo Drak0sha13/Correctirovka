@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Correctirovka.Data;
 using YD_API.ApiConnect;
+using YD_API.ModelObjects.IDictionaries;
 
 namespace Correctirovka
 {
@@ -45,6 +46,7 @@ namespace Correctirovka
 
             services.AddSingleton<WeatherForecastService>();
             services.AddSingleton<ApiSettings>();
+			services.AddSingleton<DictionariesObject>(x=> new DictionariesObject(x));
             services.AddScoped<ClientSettings>();
             //services
         }

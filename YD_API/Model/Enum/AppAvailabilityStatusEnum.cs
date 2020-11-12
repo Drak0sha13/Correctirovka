@@ -1,22 +1,16 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace API_Yandex_Direct.Model.Enum
+namespace YD_API.Model.Enum
 {
     [JsonConverter(typeof(StringEnumConverter))]
     public enum AppAvailabilityStatusEnum : byte
     {
-        /// <summary>
-        /// доступно
-        /// </summary>
+        /// <summary> доступно </summary>
         AVAILABLE,
-        /// <summary>
-        /// недоступно
-        /// </summary>
+        /// <summary> недоступно </summary>
         NOT_AVAILABLE,
-        /// <summary>
-        /// данные из магазина приложений еще не получены
-        /// </summary>
+        /// <summary> данные из магазина приложений еще не получены </summary>
         UNPROCESSED
     }
 }

@@ -1,63 +1,162 @@
 ﻿@page "/BidModifiers"
 
+@using System.Drawing
+@using BlazorUtils
 @using Correctirovka.Data
+@using Correctirovka.Data.Visual.BidModifier
+@using OfficeOpenXml
+@using OfficeOpenXml.Style
 @using YD_API.Model
 @using YD_API.ModelObjects.IBidModifier
 @using YD_API.ModelObjects.ICampaign
+@using YD_API.ModelObjects.IRetargetingList
 
 @inject NavigationManager NavigationManager
 @inject ApiConnect5 api
 @inject ClientSettings Settings
+@inject IJSRuntime JS
 
 <SetUnits api="@api" />
 
-<h3>BidModifiers</h3>
+<h3>Параметры корректировок</h3>
 
-@data.Length
+<button class="btn btn-primary" @onclick="@DownloadFile">Download</button>
+<DxDataGrid Data="@data"
+			PageSize="1000"
+			KeyFieldName="@nameof(BidModifierVisual.Id)"
+			SelectionMode="DataGridSelectionMode.OptimizedMultipleSelection"
+			ShowFilterRow="true"
+			ShowGroupPanel="true">
+	<DxDataGridColumn Field="@nameof(BidModifierVisual.CampaignId)" Width="70px" AllowGroup="false"></DxDataGridColumn>
+	<DxDataGridColumn Field="@nameof(BidModifierVisual.CampaignName)" AllowGroup="false"></DxDataGridColumn>
+	<DxDataGridColumn Field="@nameof(BidModifierVisual.Type)"></DxDataGridColumn>
+	<DxDataGridColumn Field="@nameof(BidModifierVisual.Adjustment)" Caption="Название">
+		<DisplayTemplate>
+			<span>@((context as BidModifierVisual)?.Adjustment?.Name)</span>
+		</DisplayTemplate>
+	</DxDataGridColumn>
+	<DxDataGridColumn Field="@nameof(BidModifierVisual.Adjustment)" Caption="Значение">
+		<DisplayTemplate>
+			@{
+				int? i = (context as BidModifierVisual)?.Adjustment?.Value;
+				<span class="@TextColor(i)">@i</span>
+			}
+		</DisplayTemplate>
+	</DxDataGridColumn>
+</DxDataGrid>
 
-<h2 class="error-text">@errorH</h2>
-<h3 class="error-text">@errorD</h3>
+<ApiError Error="@Error" />
 
 <div class="form-group">
-    <div class="col-sm-offset-2 col-sm-2">
-        <a href="/Campaigns">Назад</a>
-    </div>
+	<div class="col-sm-offset-2 col-sm-2">
+		<a href="/Campaigns">Назад</a>
+	</div>
 </div>
 <div class="form-group">
-    <div class="col-sm-offset-5 col-sm-2">
-        <a href="/">Вперед</a>
-    </div>
+	<div class="col-sm-offset-5 col-sm-2">
+		<a href="/">Вперед</a>
+	</div>
 </div>
 
 
 @code {
-    BidModifierObject clients;
-    BidModifier[] data = new BidModifier[0];
+	BidModifierObject clients;
+	List<BidModifierVisual> data = new List<BidModifierVisual>();
 
-    string errorH = "";
-    string errorD = "";
+	GetResultError Error { get; set; }
 
 
-    protected override async Task OnInitializedAsync()
-    {
-        string UserName = Settings.UserName;
+	protected override async Task OnInitializedAsync()
+	{
+		string UserName = Settings.UserName;
 
-        if (String.IsNullOrEmpty(UserName))
-            NavigationManager.NavigateTo("/clients");
+		if (String.IsNullOrEmpty(UserName))
+			NavigationManager.NavigateTo("/clients");
 
-        clients = new BidModifierObject(api);
-        var rez = (await clients.GetAsync(UserName, Settings.Campaigns.ToArray()));
-        if (rez == null)
-            return;
-        if (rez.Error != null)
-        {
-            errorH = rez.Error.ErrorDetail;
-            errorD = rez.Error.ErrorString;
-            return;
-        }
-        data = rez.Result.Models;
+		clients = new BidModifierObject(api);
+		var rez = (await clients.GetAsync(UserName, Settings.Campaigns.ToArray()));
+		if (rez == null)
+			return;
+		Error = rez.Error;
+		if(rez.Result == null)
+			return;
 
-        return;
+		GetResult5<RetargetingListResult5> retar = await new RetargetingListObject(api).GetNameByIdAsync(UserName,
+			rez.Result.Models
+				.Select(x => x.RetargetingAdjustment)
+				.Where(x => x != null)
+				.Select(x => x.RetargetingConditionId).Distinct().ToArray());
 
-    }
+		Error = retar.Error;
+
+		Settings.RetargetingListCash = retar.Result?.Models
+			.Select(x => new IdName()
+			{
+				ID = x.Id,
+				Name = x.Name,
+			}).ToList();
+
+		data = rez.Result.Models.Select(x => new BidModifierVisual(x, Settings)).ToList();
+
+		return;
+
+	}
+
+	protected string TextColor(int? i)
+	{
+		return i switch
+		{
+			{ } x when x > 0 => "text-success",
+			{ } x when x < 0 => "text-danger",
+			_ => "text-muted"
+		};
+	}
+
+	void DownloadFile()
+	{
+		using (var package = new ExcelPackage())
+		{
+			var worksheet = package.Workbook.Worksheets.Add("Forecasts");
+
+			var forecasts = data;
+
+			// Use LINQ to project data into the worksheet
+			var tableBody = worksheet.Cells["B2:B2"]
+				.LoadFromCollection(
+					forecasts.Select(f => new {f.Id, f.CampaignName, f.Type, f.Adjustment.Name, f.Adjustment.Value })
+					, true);
+
+			// Add conditional formatting based on temperature
+			var temperatureCol = tableBody.Offset(1, 4, forecasts.Count, 4);
+			var rule = temperatureCol.ConditionalFormatting.AddThreeColorScale();
+			rule.LowValue.Color = Color.Red;
+			rule.MiddleValue.Color = Color.White;
+			rule.HighValue.Color = Color.Green;
+
+			//// Add Temperature (F) computed via formula
+			//		worksheet.Cells[3, 4, forecasts.Length + 2, 4].Formula = "C3 * 1.8 + 32";
+			//		worksheet.Calculate();
+
+			// Formatting
+			var header = worksheet.Cells["B2:E2"];
+			worksheet.DefaultColWidth = 25;
+			//worksheet.Cells[3, 2, forecasts.Length + 2, 2].Style.Numberformat.Format = "DDD d MMM yyyy";
+
+			worksheet.Column(2).Width = 13;
+			worksheet.Column(3).Width = 57;
+			worksheet.Column(4).Width = 40;
+
+			tableBody.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+			tableBody.Style.Fill.PatternType = ExcelFillStyle.Solid;
+			tableBody.Style.Fill.BackgroundColor.SetColor(Color.WhiteSmoke);
+			tableBody.Style.Border.BorderAround(ExcelBorderStyle.Medium);
+			header.Style.Font.Bold = true;
+			header.Style.Font.Color.SetColor(Color.White);
+			header.Style.Fill.BackgroundColor.SetColor(Color.DarkBlue);
+
+			JS.SaveAs("forecasts.xlsx", package.GetAsByteArray());
+		}
+
+	}
+
 }

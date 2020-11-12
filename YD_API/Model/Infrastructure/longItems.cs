@@ -1,9 +1,9 @@
 ﻿using System.Runtime.Serialization;
 
-namespace API_Yandex_Direct.Model.Infrastructure
+namespace YD_API.Model.Infrastructure
 {
     [DataContract]
-    public struct longItems
+    public struct LongItems
     {
         [DataMember(EmitDefaultValue = false)]
         public long[] Items { get; set; }

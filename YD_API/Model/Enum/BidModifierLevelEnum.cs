@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace API_Yandex_Direct.Model.Enum
+namespace YD_API.Model.Enum
 {
     /// <summary> Уровень корректировки </summary>
     [JsonConverter(typeof(StringEnumConverter))]

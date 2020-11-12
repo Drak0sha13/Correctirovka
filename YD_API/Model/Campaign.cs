@@ -1,9 +1,9 @@
 ﻿using System.Runtime.Serialization;
 using API_Yandex_Direct.Model.CampaignI;
 using API_Yandex_Direct.Model.Enum;
-using API_Yandex_Direct.Model.Infrastructure;
 using YD_API.ApiConnect;
 using YD_API.Model.Enum;
+using YD_API.Model.Infrastructure;
 
 namespace YD_API.Model
 {
@@ -13,63 +13,45 @@ namespace YD_API.Model
         [DataMember(EmitDefaultValue = false)]
         public string BiddingStrategy { get; set; }
 
-        /// <summary>
-        /// Массив IP-адресов, которым не нужно показывать объявления. Не более 25 элементов в массиве.
-        /// </summary>
+        /// <summary> Массив IP-адресов, которым не нужно показывать объявления. Не более 25 элементов в массиве. </summary>
         [DataMember(EmitDefaultValue = false)]
         public string[] BlockedIps { get; set; }
 
-        /// <summary>
-        /// Название клиента (до 255 символов). Значение по умолчанию — наименование из настроек рекламодателя.
-        /// </summary>
+        /// <summary> Название клиента (до 255 символов). Значение по умолчанию — наименование из настроек рекламодателя. </summary>
         [DataMember(EmitDefaultValue = false)]
         public string ClientInfo { get; set; }
 
         [DataMember(EmitDefaultValue = false)]
         public string CounterIds { get; set; }
 
-        /// <summary>
-        /// Валюта кампании.Совпадает с валютой рекламодателя для всех кампаний, за исключением кампаний в у.е., 
-        ///для которых были созданы копии при переходе рекламодателя на работу в реальной валюте.
-        /// </summary>
+        /// <summary> Валюта кампании.Совпадает с валютой рекламодателя для всех кампаний, за исключением кампаний в у.е., для которых были созданы копии при переходе рекламодателя на работу в реальной валюте. </summary>
         [DataMember(EmitDefaultValue = false)]
         public CurrencyEnum Currency { get; set; }
 
-        /// <summary>
-        /// Настройки дневного бюджета кампании.
+        /// <summary> Настройки дневного бюджета кампании.
         /// <para>  Управление дневным бюджетом доступно, если в кампании выбрана ручная стратегия показа, 
         /// а также в параметре Settings, возвращаемом методом get, присутствует настройка DAILY_BUDGET_ALLOWED со значением YES.
-        /// В противном случае при попытке задать дневной бюджет возвращается ошибка.</para>
-        /// </summary>
+        /// В противном случае при попытке задать дневной бюджет возвращается ошибка.</para> </summary>
         [DataMember(EmitDefaultValue = false)]
         public DailyBudgetClass DailyBudget { get; set; }
 
-
-
-
-        /// <summary>
-        /// Дата окончания показов объявлений в формате YYYY-MM-DD. 
-        /// <para>Показы объявлений прекращаются в 24:00 по московскому времени (независимо от значения параметра TimeZone).</para>
-        /// </summary>
+        /// <summary> Дата окончания показов объявлений в формате YYYY-MM-DD. 
+        /// <para>Показы объявлений прекращаются в 24:00 по московскому времени (независимо от значения параметра TimeZone).</para> </summary>
         [DataMember(EmitDefaultValue = false)]
         public string EndDate { get; set; }
 
-
-        /// <summary>
-        ///Массив мест показа, где не нужно показывать объявления:
+        /// <summary>Массив мест показа, где не нужно показывать объявления:
         /// <para> доменные имена сайтов;</para>
         /// <para> идентификаторы мобильных приложений(bundle ID для iOS, package name для Android);</para>
         /// <para> наименования внешних сетей(SSP). Список наименований можно получить с помощью метода Dictionaries.get.</para>
-        /// <para>   Не более 1000 элементов в массиве.Не более 255 символов в каждом элементе массива.</para>
-        /// </summary>
+        /// <para>   Не более 1000 элементов в массиве.Не более 255 символов в каждом элементе массива.</para> </summary>
         [DataMember(EmitDefaultValue = false)]
         public string[] ExcludedSites { get; set; }
 
-        /// <summary>
-        ///  Финансовые показатели кампании.
-        /// </summary>
+        /// <summary> Финансовые показатели кампании. </summary>
         [DataMember(EmitDefaultValue = false)]
         public FundsParam Funds { get; set; }
+
         [DataContract]
         public class FundsParam
         {

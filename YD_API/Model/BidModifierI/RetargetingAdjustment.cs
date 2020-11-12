@@ -5,7 +5,7 @@ namespace YD_API.Model.BidModifierI
 {
     /// <summary> Параметры корректировки ставок для посетивших сайт. </summary>
     [DataContract]
-    public class RetargetingAdjustment
+    public class RetargetingAdjustment : Adjustment
     {
         /// <summary> Идентификатор условия подбора аудитории. </summary>
         [DataMember(EmitDefaultValue = false)]
@@ -18,9 +18,5 @@ namespace YD_API.Model.BidModifierI
         /// <summary> Включен или отключен набор корректировок по полу и возрасту. </summary>
         [DataMember(EmitDefaultValue = false)]
         public YesNoEnum Enabled { get; set; }
-
-        /// <summary> Значение коэффициента к ставке </summary>
-        [DataMember(EmitDefaultValue = false)]
-        public int BidModifier { get; set; }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System.Runtime.Serialization;
-using API_Yandex_Direct.Model.Enum;
 using YD_API.ApiConnect;
 using YD_API.Model.BidModifierI;
 using YD_API.Model.Enum;
@@ -15,7 +14,7 @@ namespace YD_API.Model
 
 		/// <summary> Идентификатор группы объявлений, к которой относится ключевая фраза. </summary>
 		[DataMember(EmitDefaultValue = false)]
-		public long AdGroupId { get; set; }
+		public long? AdGroupId { get; set; }
 
 		/// <summary> Идентификатор ключевой фразы. </summary>
 		[DataMember(EmitDefaultValue = false)]
@@ -41,9 +40,7 @@ namespace YD_API.Model
 		[DataMember(EmitDefaultValue = false)]
 		public DemographicsAdjustment DemographicsAdjustment { get; set; }
 
-		/// <summary>
-		/// Параметры корректировки ставок для посетивших сайт.
-		/// </summary>
+		/// <summary> Параметры корректировки ставок для посетивших сайт. </summary>
 		[DataMember(EmitDefaultValue = false)]
 		public RetargetingAdjustment RetargetingAdjustment { get; set; }
 
@@ -59,5 +56,4 @@ namespace YD_API.Model
 		[DataMember(EmitDefaultValue = false)]
 		public Adjustment SmartAdAdjustment { get; set; }
 	}
-
 }

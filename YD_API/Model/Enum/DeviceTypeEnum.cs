@@ -1,18 +1,14 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace API_Yandex_Direct.Model.Enum
+namespace YD_API.Model.Enum
 {
     [JsonConverter(typeof(StringEnumConverter))]
     public enum DeviceTypeEnum : byte
     {
-        /// <summary>
-        /// смартфоны
-        /// </summary>
+        /// <summary> смартфоны </summary>
         DEVICE_TYPE_MOBILE,
-        /// <summary>
-        /// планшеты
-        /// </summary>
+        /// <summary> планшеты </summary>
         DEVICE_TYPE_TABLET
     }
 }

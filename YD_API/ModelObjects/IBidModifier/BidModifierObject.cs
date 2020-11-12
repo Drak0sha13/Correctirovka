@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using API_Yandex_Direct.Model.Enum;
 using YD_API.ApiConnect;
+using YD_API.Model.Enum;
 using YD_API.ModelObjects.IClient;
 
 namespace YD_API.ModelObjects.IBidModifier
@@ -70,7 +70,7 @@ namespace YD_API.ModelObjects.IBidModifier
 				Method = MethodEnum.Get,
 				Params = request,
 			};
-			return apiConnect.RequestStreamApi<GetResult5<BidModifierResult5>>(req, this, new UserHeader(userName));
+			return apiConnect.GetAsync<GetResult5<BidModifierResult5>>(req, this, new UserHeader(userName));
 
 		}
 	}

@@ -25,7 +25,9 @@ namespace YD_API.ModelObjects.ICampaign
 				FieldNames = new[] {
 					CampaignFieldNamesEnum.Id,
 					CampaignFieldNamesEnum.Name,
-					CampaignFieldNamesEnum.Status},
+					CampaignFieldNamesEnum.Status,
+					CampaignFieldNamesEnum.State,
+				},
 				SelectionCriteria = new CampaignsSelectionCriteria()
 				{
 					States = new []
@@ -47,7 +49,7 @@ namespace YD_API.ModelObjects.ICampaign
 				Method = MethodEnum.Get,
 				Params = request,
 			};
-			return apiConnect.RequestStreamApi<GetResult5<CampaignResult5>>(req, this, new UserHeader(userName));
+			return apiConnect.GetAsync<GetResult5<CampaignResult5>>(req, this, new UserHeader(userName));
 		}
 	}
 }

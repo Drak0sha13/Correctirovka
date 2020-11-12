@@ -11,17 +11,17 @@
 <SetUnits api="@api" />
 
 <DxDataGrid Data="@data"
+            PageSize="1000"
             KeyFieldName="@nameof(Campaign.Id)"
             SelectionMode="DataGridSelectionMode.OptimizedMultipleSelection"
             SelectAllMode="DataGridSelectAllMode.AllPages"
             OptimizedMultipleSelectionChanged="@OnSelectionChanged"
             ShowFilterRow="true"
-            ShowPager="true"
             ShowGroupPanel="true">
     <DxDataGridSelectionColumn></DxDataGridSelectionColumn>
     <DxDataGridColumn Field="@nameof(Campaign.Id)" Width="70px" AllowGroup="false"></DxDataGridColumn>
     <DxDataGridColumn Field="@nameof(Campaign.Name)" AllowGroup="false"></DxDataGridColumn>
-    <DxDataGridColumn Field="@nameof(Campaign.Status)"></DxDataGridColumn>
+    <DxDataGridColumn Field="@nameof(Campaign.State)"></DxDataGridColumn>
 </DxDataGrid>
 
 <ApiError Error="@Error"/>
@@ -39,45 +39,56 @@
 
 @code {
 
-    [Parameter]
-    public string UserName { get; set; }
+	[Parameter]
+	public string UserName { get; set; }
 
-    CampaignObject clients;
-    Campaign[] data = new Campaign[0];
+	CampaignObject clients;
+	Campaign[] data = new Campaign[0];
 
-    GetResultError Error { get; set; }
+	GetResultError Error { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		string userName = UserName ?? Settings.UserName;
+		if (String.IsNullOrEmpty(userName))
+			NavigationManager.NavigateTo("/clients");
+
+		//	    Settings.OnChange += StateHasChanged;
+
+		clients = new CampaignObject(api);
+		var rez = (await clients.GetAsync(userName));
+		if (rez == null)
+			return;
+		Error = rez.Error;
+
+		if(rez.Result != null)
+			data = rez.Result.Models;
+
+		Settings.CampaignCash = data?
+			.Select(x => new IdName()
+			{
+				ID = x.Id,
+				Name = x.Name
+			}).ToList();
 
 
-    protected override async Task OnInitializedAsync()
-    {
-        if (String.IsNullOrEmpty(UserName))
-            NavigationManager.NavigateTo("/clients");
-        clients = new CampaignObject(api);
-        var rez = (await clients.GetAsync(UserName));
-        if (rez == null)
-            return;
-        Error = rez.Error;
-        
-        if(rez.Result != null)
-            data = rez.Result.Models;
+		return;
 
-        return;
+	}
 
-    }
+	int SelectedCount { get; set; }
 
-    int SelectedCount { get; set; }
+	int StoredSelectedCount { get; set; }
 
-    int StoredSelectedCount { get; set; }
+	int StoredUnselectedCount { get; set; }
 
-    int StoredUnselectedCount { get; set; }
-
-    protected async Task OnSelectionChanged(DataGridSelection<Campaign> selection)
-    {
-        StoredSelectedCount = selection.SelectedKeysStored.Count();
-        StoredUnselectedCount = selection.UnselectedKeysStored.Count();
-        Settings.Campaigns = (await selection.SelectedKeys).Cast<long>();
-        //SelectedCount = selectedKeys.Count();
-        await InvokeAsync(StateHasChanged);
-    }
+	protected async Task OnSelectionChanged(DataGridSelection<Campaign> selection)
+	{
+		StoredSelectedCount = selection.SelectedKeysStored.Count();
+		StoredUnselectedCount = selection.UnselectedKeysStored.Count();
+		Settings.Campaigns = (await selection.SelectedKeys).Cast<long>();
+		//SelectedCount = selectedKeys.Count();
+		await InvokeAsync(StateHasChanged);
+	}
 
 }

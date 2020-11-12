@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace API_Yandex_Direct.Model.BidsI
+namespace YD_API.Model.BidsI
 {
     [DataContract]
     public class ContextCoverage

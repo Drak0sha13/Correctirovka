@@ -36,11 +36,11 @@ namespace YD_API.ApiConnect
 
 		/// <summary> получаем ответ яндекс директ </summary>
 		/// <param name="requestObj">объект которые необходимо отправить RequestObjectV5 или RequestObjectV4</param>
-		/// <param name="siteObject">Объект в Яндекс директ, для запроса</param>
+		/// <param name="obj">Объект в Яндекс директ, для запроса</param>
 		/// <param name="headers">Заголовки запроса</param>
 		/// <returns></returns>
 		// <param name="UseOperatorUnits">Use-Operator-Units: true  - Расходовать баллы агентства, а не рекламодателя при выполнении запроса. Заголовок допустим только в запросах от имени агентства.</param>
-		public async Task<T> RequestStreamApi<T>(object requestObj, ModelObject obj, params (string, string)[] headers)
+		protected async Task<T> RequestStreamApi<T>(object requestObj, ModelObject obj, params (string, string)[] headers)
 		{
 			string s = await RequestStreamApi(requestObj, obj.Name,  headers);
 			return JsonConvert.DeserializeObject<T>(s);
@@ -56,7 +56,7 @@ namespace YD_API.ApiConnect
 		{
 			HttpRequestMessage рttpWebRequest = GetHttpWebRequest(requestObj, siteObject, headers);
 
-			using (HttpResponseMessage resp = await Client.SendAsync(рttpWebRequest))
+			using (HttpResponseMessage resp = await Client.SendAsync(рttpWebRequest, HttpCompletionOption.ResponseHeadersRead))
 			{
 				resp.EnsureSuccessStatusCode();
 

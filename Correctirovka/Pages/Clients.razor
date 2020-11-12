@@ -14,6 +14,7 @@
 
 <DxDataGrid Data="@data"
             ShowFilterRow="true"
+			PageSize="1000"
             @bind-SingleSelectedDataRow="@Settings.User">
     <DxDataGridColumn Field="@nameof(Client.ClientId)" Width="70px" ></DxDataGridColumn>
     <DxDataGridColumn Field="@nameof(Client.Login)" ></DxDataGridColumn>
@@ -42,6 +43,8 @@
 
 	protected override async Task OnInitializedAsync()
 	{
+		Settings.OnChange += StateHasChanged;
+
 		clients = new AgencyClientsObject(api);
 		var rez = (await clients.GetAsync());
 		if (rez == null)
@@ -52,8 +55,7 @@
 		if (Settings.User == null)
 			Settings.User = data?[0];
 
-	//Settings.Units = api.Units;
-		return;
+		var d = Settings.Cash.GeoRegions;
 	}
 
 	enum Opinion

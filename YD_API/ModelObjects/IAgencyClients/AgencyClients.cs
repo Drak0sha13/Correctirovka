@@ -36,7 +36,7 @@ namespace YD_API.ModelObjects.IAgencyClients
 				Method = MethodEnum.Get,
 				Params = request,
 			};
-			return apiConnect.RequestStreamApi<GetResult5<ClientResult5>>(req, this);
+			return apiConnect.GetAsync<GetResult5<ClientResult5>>(req, this);
 		}
 	}
 

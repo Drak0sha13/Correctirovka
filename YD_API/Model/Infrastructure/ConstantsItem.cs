@@ -1,24 +1,17 @@
 ﻿using System.Runtime.Serialization;
 
-namespace API_Yandex_Direct.Model.Infrastructure
+namespace YD_API.Model.Infrastructure
 {
+	/// <summary> Ограничения на значения параметров. </summary>
+	[DataContract]
+	public class ConstantsItem<T> where T : struct
+	{
+		/// <summary> Наименование ограничения. </summary>
+		[DataMember]
+		public T Name { get; set; }
 
-    /// <summary>
-    /// Ограничения на значения параметров.
-    /// </summary>
-    [DataContract]
-    public class ConstantsItem
-    {
-        /// <summary>
-        /// Наименование ограничения.
-        /// </summary>
-        [DataMember(EmitDefaultValue = false)]
-        public string Name { get; set; }
-
-        /// <summary>
-        /// Значение ограничения.
-        /// </summary>
-        [DataMember(EmitDefaultValue = false)]
-        public string Value { get; set; }
-    }
+		/// <summary> Значение ограничения. </summary>
+		[DataMember]
+		public string Value { get; set; }
+	}
 }
